@@ -171,6 +171,11 @@ if st.button('Predict Animal Price'):
     predicted_price = loaded_model.predict(scaled_df)
     Animal_Price = round(predicted_price[0])
     st.write(f'The Price of selected Dairy Animal is Rupees: {Animal_Price}')
+    # Display image based on Animal_Breed
+    if Animal_Breed == 0:  # 'HF' is mapped to 0
+        st.image('hf.jpg', width=160)
+    else:  # 'JY' is mapped to 1
+        st.image('jy.jpg', width=160)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
