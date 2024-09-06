@@ -5,6 +5,8 @@ import pickle
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.utils import ImageReader
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -181,26 +183,39 @@ if st.button('Predict Animal Price'):
         st.image('jy.jpg', width=160)
 
 
-    # PDF Generation Function
+    # PDF Generation Function with Colored Header and Logo Below Header
     def create_pdf():
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
 
-        # Title
-        c.drawString(100, 750, "Animal Price Prediction Application")
-        c.drawImage('IMG-jkvda.jpg.jpg', 100, 700, width=50, height=50)  # Example of inserting image
+        # Draw Colored Header Rectangle
+        c.setFillColor(colors.HexColor("#007bff"))
+        c.rect(50, 550, 550, 50, fill=True, stroke=False)
+
+        # Title in White
+        c.setFillColor(colors.white)
+        c.setFont("Helvetica-Bold", 20)
+        c.drawString(100, 565, "Animal Price Prediction Application")
+
+        # Add Logo Below the Header (adjust path and dimensions as needed)
+        logo_path = "IMG-jkvda.jpg.jpg"  # Ensure this path points to the correct image file
+        logo = ImageReader(logo_path)
+        c.drawImage(logo, 250, 650, width=100, height=100)  # Adjust the y-position for below header
 
         # Results
-        c.drawString(100, 680, f"Prediction Result: The Price of selected Dairy Animal is Rupees: {Animal_Price}")
+        c.setFillColor(colors.black)
+        c.setFont("Helvetica", 12)
+        c.drawString(100, 510, f"Prediction Result: The Price of selected Dairy Animal is Rupees: {Animal_Price}")
 
         # Input Data
-        c.drawString(100, 650, "Input Details:")
-        c.drawString(100, 630, f"Animal Breed: {'JY' if Animal_Breed == 1 else 'HF'}")
-        c.drawString(100, 610, f"Milk Yield: {Milk_Yield} liters")
-        c.drawString(100, 590, f"Parity No: {Parity_No}")
-        c.drawString(100, 570, f"Pregnancy Status: {'Yes' if Pregnancy_Status == 1 else 'No'}")
-        c.drawString(100, 550, f"Pregnancy Trimester: {Pregnancy_Trimester}")
+        c.drawString(100, 470, "Input Details:")
+        c.drawString(100, 450, f"Animal Breed: {'JY' if Animal_Breed == 1 else 'HF'}")
+        c.drawString(100, 430, f"Milk Yield: {Milk_Yield} liters")
+        c.drawString(100, 410, f"Parity No: {Parity_No}")
+        c.drawString(100, 390, f"Pregnancy Status: {'Yes' if Pregnancy_Status == 1 else 'No'}")
+        c.drawString(100, 370, f"Pregnancy Trimester: {Pregnancy_Trimester}")
 
+        c.drawString(100, 290, f"Disclaimer: This is a system generated price and may vary slightly from the actual price.")
         # Footer
         c.drawString(100, 100, "Courtesy: Jammu & Kashmir Veterinary Doctors Association-Kashmir")
 
@@ -223,3 +238,4 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # Footer
 st.markdown('<div class="footer"><p><a href="https://yourwebsite.com">jkvda.org</a></p></div>', unsafe_allow_html=True)
+
