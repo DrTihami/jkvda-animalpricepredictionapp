@@ -176,6 +176,17 @@ if st.button('Predict Animal Price'):
         st.image('hf.jpg', width=160)
     else:  # 'JY' is mapped to 1
         st.image('jy.jpg', width=160)
+download_pdf_js = """
+    <script>
+    function downloadPageAsPDF() {
+        window.print();
+    }
+    </script>
+    """
+
+# Add a button that triggers the download as PDF
+st.markdown(download_pdf_js, unsafe_allow_html=True)
+st.button("Download Page as PDF", on_click=lambda: st.markdown('<script>downloadPageAsPDF()</script>', unsafe_allow_html=True))
 
 st.markdown('</div>', unsafe_allow_html=True)
 
