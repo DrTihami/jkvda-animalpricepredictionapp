@@ -2,6 +2,9 @@
 import streamlit as st
 import pandas as pd
 import pickle
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -176,17 +179,45 @@ if st.button('Predict Animal Price'):
         st.image('hf.jpg', width=160)
     else:  # 'JY' is mapped to 1
         st.image('jy.jpg', width=160)
-download_pdf_js = """
-    <script>
-    function downloadPageAsPDF() {
-        window.print();
-    }
-    </script>
-    """
 
-# Add a button that triggers the download as PDF
-st.markdown(download_pdf_js, unsafe_allow_html=True)
-st.button("Download Page as PDF", on_click=lambda: st.markdown('<script>downloadPageAsPDF()</script>', unsafe_allow_html=True))
+
+    # PDF Generation Function
+    def create_pdf():
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer, pagesize=letter)
+
+        # Title
+        c.drawString(100, 750, "Animal Price Prediction Application")
+        c.drawImage('IMG-jkvda.jpg.jpg', 100, 700, width=50, height=50)  # Example of inserting image
+
+        # Results
+        c.drawString(100, 680, f"Prediction Result: The Price of selected Dairy Animal is Rupees: {Animal_Price}")
+
+        # Input Data
+        c.drawString(100, 650, "Input Details:")
+        c.drawString(100, 630, f"Animal Breed: {'JY' if Animal_Breed == 1 else 'HF'}")
+        c.drawString(100, 610, f"Milk Yield: {Milk_Yield} liters")
+        c.drawString(100, 590, f"Parity No: {Parity_No}")
+        c.drawString(100, 570, f"Pregnancy Status: {'Yes' if Pregnancy_Status == 1 else 'No'}")
+        c.drawString(100, 550, f"Pregnancy Trimester: {Pregnancy_Trimester}")
+
+        # Footer
+        c.drawString(100, 100, "Courtesy: Jammu & Kashmir Veterinary Doctors Association-Kashmir")
+
+        c.showPage()
+        c.save()
+
+        buffer.seek(0)
+        return buffer
+
+
+    # PDF Download Button
+    st.download_button(
+        label="Download Report as PDF",
+        data=create_pdf(),
+        file_name="animal_price_prediction_report.pdf",
+        mime="application/pdf"
+    )
 
 st.markdown('</div>', unsafe_allow_html=True)
 
