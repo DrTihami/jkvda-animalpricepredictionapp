@@ -1,5 +1,4 @@
 
-import streamlit as st
 import pandas as pd
 import pickle
 from io import BytesIO
@@ -7,6 +6,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.utils import ImageReader
+from datetime import datetime
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -188,37 +188,44 @@ if st.button('Predict Animal Price'):
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
 
-        # Draw Colored Header Rectangle
-        c.setFillColor(colors.HexColor("#007bff"))
-        c.rect(50, 550, 550, 50, fill=True, stroke=False)
-
-        # Title in White
-        c.setFillColor(colors.white)
-        c.setFont("Helvetica-Bold", 20)
-        c.drawString(100, 565, "Animal Price Prediction Application")
-
         # Add Logo Below the Header (adjust path and dimensions as needed)
         logo_path = "IMG-jkvda.jpg.jpg"  # Ensure this path points to the correct image file
         logo = ImageReader(logo_path)
         c.drawImage(logo, 250, 650, width=100, height=100)  # Adjust the y-position for below header
 
-        # Results
-        c.setFillColor(colors.black)
+        # Draw Colored Header Rectangle
+        c.setFillColor(colors.HexColor("#007bff"))
+        c.rect(50, 570, 550, 50, fill=True, stroke=False)
+
+        # Title in White
+        c.setFillColor(colors.white)
+        c.setFont("Helvetica-Bold", 20)
+        c.drawString(100, 585, "JKVDA Animal Price Prediction Application")
+
+        # Current Timestamp
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         c.setFont("Helvetica", 12)
-        c.drawString(100, 510, f"Prediction Result: The Price of selected Dairy Animal is Rupees: {Animal_Price}")
+        c.setFillColor(colors.black)
+        c.drawString(200, 530, f"Report generated on: {current_time}")
 
         # Input Data
-        c.drawString(100, 470, "Input Details:")
-        c.drawString(100, 450, f"Animal Breed: {'JY' if Animal_Breed == 1 else 'HF'}")
-        c.drawString(100, 430, f"Milk Yield: {Milk_Yield} liters")
-        c.drawString(100, 410, f"Parity No: {Parity_No}")
-        c.drawString(100, 390, f"Pregnancy Status: {'Yes' if Pregnancy_Status == 1 else 'No'}")
-        c.drawString(100, 370, f"Pregnancy Trimester: {Pregnancy_Trimester}")
+        c.setFillColor(colors.black)
+        c.setFont("Helvetica", 12)
+        c.drawString(100, 510, "Input Details:")
+        c.drawString(100, 490, f"Animal Breed: {'JY' if Animal_Breed == 1 else 'HF'}")
+        c.drawString(100, 470, f"Milk Yield: {Milk_Yield} liters")
+        c.drawString(100, 450, f"Parity No: {Parity_No}")
+        c.drawString(100, 430, f"Pregnancy Status: {'Yes' if Pregnancy_Status == 1 else 'No'}")
+        c.drawString(100, 410, f"Pregnancy Trimester: {Pregnancy_Trimester}")
 
-        c.drawString(100, 290, f"Disclaimer: This is a system generated price and may vary slightly from the actual price.")
+        # Results
+
+        c.drawString(100, 380, f"Predicted Price: The Price of selected Dairy Animal is Rupees: {Animal_Price}")
+
+        c.drawString(100, 300, "Courtesy: Jammu & Kashmir Veterinary Doctors Association-Kashmir")
+
+        c.drawString(100, 100, f"Disclaimer: This is a system generated price and may vary slightly from the actual price.")
         # Footer
-        c.drawString(100, 100, "Courtesy: Jammu & Kashmir Veterinary Doctors Association-Kashmir")
-
         c.showPage()
         c.save()
 
