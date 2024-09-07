@@ -7,6 +7,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.utils import ImageReader
 from datetime import datetime
+import pytz  # To handle Indian timezone
+import random  # To generate random number
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -136,17 +138,29 @@ st.subheader('Enter the Animal details to know the Price')
 # Input fields
 col1, col2 = st.columns(2)
 with col1:
-    Animal_Breed = st.selectbox("Select the Breed of the Animal?", ("HF", "JY"))
+    Name_of_Farmer = st.text_input('Enter Farmer\'s Name')
 with col2:
+    Parentage = st.text_input('Enter Parentage of Farmer')
+
+col3, col4 = st.columns(2)
+with col3:
+    Address = st.text_input('Enter Address of the Farmer')
+with col4:
+    Tag_Number = st.text_input('Enter Ear Tag No of the Animal')
+
+col5, col6 = st.columns(2)
+with col5:
+    Animal_Breed = st.selectbox("Select the Breed of the Animal?", ("HF", "JY"))
+with col6:
     Milk_Yield = st.slider("Select Milk Yield (liters)", 10, 30, value=20, step=1)
 
-col3, col4, col5 = st.columns(3)
-with col3:
+col7, col8, col9 = st.columns(3)
+with col7:
     Parity_No = st.selectbox("Select Lactation No of Animal?", [0, 1, 2, 3])
-with col4:
+with col8:
     Pregnancy_Status = st.selectbox("Select Pregnancy Status?", ("Yes", "No"))
 # Conditionally set Pregnancy_Trimester
-with col5:
+with col9:
     if Pregnancy_Status == "No":
         Pregnancy_Trimester = 0
     else:
@@ -182,8 +196,7 @@ if st.button('Predict Animal Price'):
     else:  # 'JY' is mapped to 1
         st.image('jy.jpg', width=160)
 
-
-    # PDF Generation Function with Colored Header and Logo Below Header
+    # PDF Generation Function with Indian timezone, custom number, and added farmer's details
     def create_pdf():
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
@@ -202,29 +215,41 @@ if st.button('Predict Animal Price'):
         c.setFont("Helvetica-Bold", 20)
         c.drawString(100, 585, "JKVDA Animal Price Prediction Application")
 
-        # Current Timestamp
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # Set timezone to IST
+        ist = pytz.timezone('Asia/Kolkata')
+        current_time = datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
+
+        # Generate a four-digit random number
+        random_number = random.randint(1000, 9999)
+
+        # Combine custom number and timestamp
+        report_number = f"JKVDA/K/SGR/{random_number}"
+
         c.setFont("Helvetica", 12)
         c.setFillColor(colors.black)
-        c.drawString(200, 530, f"Report generated on: {current_time}")
+        c.drawString(100, 530, f"Report No: {report_number}          Report Date & Time: {current_time}")
+
+        # Farmer Details
+        c.drawString(100, 500, f"Farmer's Name: {Name_of_Farmer}")
+        c.drawString(100, 480, f"Parentage: {Parentage}")
+        c.drawString(100, 460, f"Address: {Address}")
+        c.drawString(100, 440, f"Tag Number of the Animal: {Tag_Number}")
 
         # Input Data
-        c.setFillColor(colors.black)
-        c.setFont("Helvetica", 12)
-        c.drawString(100, 510, "Input Details:")
-        c.drawString(100, 490, f"Animal Breed: {'JY' if Animal_Breed == 1 else 'HF'}")
-        c.drawString(100, 470, f"Milk Yield: {Milk_Yield} liters")
-        c.drawString(100, 450, f"Parity No: {Parity_No}")
-        c.drawString(100, 430, f"Pregnancy Status: {'Yes' if Pregnancy_Status == 1 else 'No'}")
-        c.drawString(100, 410, f"Pregnancy Trimester: {Pregnancy_Trimester}")
+        c.drawString(100, 410, "Input Details:")
+        c.drawString(100, 390, f"Animal Breed: {'JY' if Animal_Breed == 1 else 'HF'}")
+        c.drawString(100, 370, f"Milk Yield: {Milk_Yield} liters")
+        c.drawString(100, 350, f"Parity No: {Parity_No}")
+        c.drawString(100, 330, f"Pregnancy Status: {'Yes' if Pregnancy_Status == 1 else 'No'}")
+        c.drawString(100, 310, f"Pregnancy Trimester: {Pregnancy_Trimester}")
 
         # Results
+        c.drawString(100, 280, f"Predicted Price: The Price of selected Dairy Animal is Rupees: {Animal_Price}")
 
-        c.drawString(100, 380, f"Predicted Price: The Price of selected Dairy Animal is Rupees: {Animal_Price}")
+        c.drawString(100, 200, "Courtesy: Jammu & Kashmir Veterinary Doctors Association-Kashmir")
 
-        c.drawString(100, 300, "Courtesy: Jammu & Kashmir Veterinary Doctors Association-Kashmir")
-
-        c.drawString(100, 100, f"Disclaimer: This is a system generated price and may vary slightly from the actual price.")
+        c.drawString(100, 100,
+                     f"Disclaimer: This is a system generated price and may vary slightly from the actual price.")
         # Footer
         c.showPage()
         c.save()
@@ -245,4 +270,3 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # Footer
 st.markdown('<div class="footer"><p><a href="https://yourwebsite.com">jkvda.org</a></p></div>', unsafe_allow_html=True)
-
